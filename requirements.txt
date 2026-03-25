@@ -1,0 +1,39 @@
+# Web framework
+fastapi==0.135.1
+uvicorn[standard]==0.41.0
+
+# Database
+sqlalchemy==2.0.48
+alembic==1.18.4
+psycopg2-binary==2.9.10
+
+# Validation
+pydantic==2.11.0
+pydantic-settings==2.13.1
+
+# Auth
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+python-multipart==0.0.20
+
+# AWS
+boto3==1.37.0
+
+# AI — pinned to compatible 0.3.x family
+langchain==0.3.21
+langchain-anthropic==0.3.14
+langchain-core==0.3.76
+
+# Cache
+redis==5.2.1
+
+# Testing
+pytest==8.3.5
+pytest-asyncio==0.25.3
+httpx==0.28.1
+
+# Code quality
+black==25.1.0
+ruff==0.15.5
+pre-commit==4.2.0

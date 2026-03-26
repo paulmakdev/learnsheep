@@ -70,6 +70,7 @@ class QuestionPredefinedValues(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     generator_group_id = Column(UUID(as_uuid=True), ForeignKey('question_generator_groups.id'), nullable=False)
     value = Column(String)
+    value_type = Column(String)
     pair_index = Column(Integer)
     # only valid if pair index
     pair_order = Column(Integer)

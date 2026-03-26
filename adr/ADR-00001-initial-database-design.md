@@ -182,4 +182,3 @@ server_ts: server timestamp
 
 indexes:
 - user_id + session_id, used to keep track of a user's events, as well as which session they were in when event happened
-

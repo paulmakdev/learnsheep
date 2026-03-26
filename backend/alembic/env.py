@@ -6,6 +6,8 @@ import importlib
 import pkgutil
 from pathlib import Path
 import sys
+from app.core.database import Base
+
 
 # Add project root to path so imports work
 sys.path.insert(0, str(Path(__file__).parents[1]))
@@ -14,8 +16,6 @@ sys.path.insert(0, str(Path(__file__).parents[1]))
 models_path = Path(__file__).parents[1] / "models"
 for _, module_name, _ in pkgutil.iter_modules([str(models_path)]):
     importlib.import_module(f"models.{module_name}")
-
-from app.core.database import Base  # adjust this path if your Base is elsewhere
 
 target_metadata = Base.metadata
 
@@ -68,9 +68,7 @@ def run_migrations_online():
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

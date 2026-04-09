@@ -15,14 +15,46 @@ import uuid
 from app.core.database import Base
 
 
-class Difficulty(enum.Enum):
+class OrderedEnum(enum.Enum):
+    def __lt__(self, other):
+        members = list(self.__class__)
+        return members.index(self) < members.index(other)
+
+    def __gt__(self, other):
+        members = list(self.__class__)
+        return members.index(self) > members.index(other)
+
+
+class Difficulty(str, OrderedEnum):
+    # order matters here for downgrading difficulty
     EASY = "easy"
     NORMAL = "normal"
     HARD = "hard"
     CHALLENGE = "challenge"
 
+    # get easier difficulty, or get None if already easy
+    def downgrade(self):
+        members = list(Difficulty)
+        current_index = members.index(self)
+        if current_index == 0:
+            return None
+        return members[current_index - 1]
 
-class GeneratorType(enum.Enum):
+    # get harder difficulty, or get None if already challenge
+    def upgrade(self):
+        members = list(Difficulty)
+        current_index = members.index(self)
+        if current_index == 3:
+            return None
+        return members[current_index + 1]
+
+
+class QuestionStyle(str, enum.Enum):
+    MULTIPLE_CHOICE = "multiple_choice"
+    TEXTBOX = "textbox"
+
+
+class GeneratorType(str, enum.Enum):
     GENERAL = "general"
     WORD = "word"
     WORD_PAIRING = "word-pairing"
@@ -37,8 +69,13 @@ class Question(Base):
         Enum(Difficulty, name="difficulty"), nullable=False, default=Difficulty.EASY
     )
     template = Column(JSONB)
-    times_encountered = Column(Integer)
-    times_correct = Column(Integer)
+    question_style = Column(
+        Enum(QuestionStyle, name="question_style"),
+        nullable=False,
+        default=QuestionStyle.TEXTBOX,
+    )
+    times_encountered = Column(Integer, default=0)
+    times_correct = Column(Integer, default=0)
     generator_group_id = Column(
         UUID(as_uuid=True), ForeignKey("question_generator_groups.id")
     )
@@ -57,8 +94,9 @@ class QuestionHistory(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     question_id = Column(UUID(as_uuid=True), ForeignKey("questions.id"), nullable=False)
     lesson_id = Column(UUID(as_uuid=True), ForeignKey("lessons.id"), nullable=False)
-    question_terms = Column(JSONB)
-    question_answer = Column(JSONB)
+    question_values = Column(JSONB)
+    question_choices = Column(JSONB)
+    question_answers = Column(JSONB)
     user_answer = Column(JSONB)
     correct = Column(Boolean, nullable=False)
 

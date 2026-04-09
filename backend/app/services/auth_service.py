@@ -19,7 +19,7 @@ def register_user(db: Session, data: RegisterRequest) -> dict:
     db.commit()
     db.refresh(user)
 
-    token = create_access_token({"sub": user.email})
+    token = create_access_token({"sub": str(user.id)})
     return {"access_token": token, "token_type": "bearer"}
 
 
@@ -31,5 +31,5 @@ def login_user(db: Session, data: LoginRequest) -> dict:
             "Invalid credentials"
         )  # Same error for both cases — intentional
 
-    token = create_access_token({"sub": user.email})
+    token = create_access_token({"sub": str(user.id)})
     return {"access_token": token, "token_type": "bearer"}

@@ -1,0 +1,12 @@
+# Import whatever backend requirements we have
+-r backend/requirements.txt
+
+# Testing
+pytest==8.3.5
+pytest-asyncio==0.25.3
+httpx==0.28.1
+
+# Code quality
+black==25.1.0
+ruff==0.15.5
+pre-commit==4.2.0

@@ -1,0 +1,62 @@
+*.tfvars
+*.env
+
+# -----------------------------
+# Terraform core
+# -----------------------------
+.terraform/
+.terraform.lock.hcl
+
+# State files (VERY IMPORTANT)
+*.tfstate
+*.tfstate.*
+crash.log
+
+# -----------------------------
+# Sensitive variable files
+# -----------------------------
+*.tfvars
+*.tfvars.json
+
+# Allow example files
+!*.tfvars.example
+
+# -----------------------------
+# Environment files
+# -----------------------------
+.env
+.env.*
+!.env.example
+
+# -----------------------------
+# CLI overrides
+# -----------------------------
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# -----------------------------
+# Plan files
+# -----------------------------
+*.tfplan
+
+# -----------------------------
+# OS / editor junk
+# -----------------------------
+.DS_Store
+Thumbs.db
+
+# -----------------------------
+# Node / frontend (if monorepo)
+# -----------------------------
+node_modules/
+dist/
+build/
+
+# -----------------------------
+# Python (if backend exists)
+# -----------------------------
+__pycache__/
+*.pyc
+.venv/

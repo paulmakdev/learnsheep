@@ -158,10 +158,6 @@ resource "aws_ecs_service" "backend" {
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 200
 
-  lifecycle {
-    ignore_changes = [task_definition] # CI/CD manages this
-  }
-
   load_balancer {
     target_group_arn = var.backend_target_arn
     container_name   = "backend"

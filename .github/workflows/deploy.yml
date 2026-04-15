@@ -17,7 +17,6 @@ env:
   ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
   ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
   CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
-  ECS_TASK_DEFINITION_FAMILY: ${{ secrets.ECS_TASK_DEFINITION_FAMILY }}
 
 jobs:
   deploy:
@@ -49,26 +48,27 @@ jobs:
           docker push $IMAGE
           echo "image=$IMAGE" >> $GITHUB_OUTPUT
 
-      - name: Download current task definition from AWS
+      # ✅ FIXED STEP: always use the task definition currently used by the service
+      - name: Get current task definition from ECS service
         run: |
+          TASK_DEF_ARN=$(aws ecs describe-services \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.ECS_SERVICE }} \
+            --query "services[0].taskDefinition" \
+            --output text)
+
+          echo "Using task definition: $TASK_DEF_ARN"
+
           aws ecs describe-task-definition \
-            --task-definition ${{ env.ECS_TASK_DEFINITION_FAMILY }} \
+            --task-definition $TASK_DEF_ARN \
             --query taskDefinition \
-            --output json | jq 'del(
-              .taskDefinitionArn,
-              .revision,
-              .status,
-              .requiresAttributes,
-              .compatibilities,
-              .registeredAt,
-              .registeredBy
-            )' > /tmp/task-def-current.json
+            --output json > /tmp/task-def.json
 
       - name: Render task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: /tmp/task-def-current.json
+          task-definition: /tmp/task-def.json
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
@@ -80,6 +80,6 @@ jobs:
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
 
-      - name: Verify deployment health
+      - name: Verify deployment health (skipped because AWS does this for us)
         run: |
           echo "Deployment complete — add health check endpoint when ready"

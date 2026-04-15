@@ -1,5 +1,10 @@
 name: Deploy to AWS
 
+# Give permissions to GitHub OIDC to request token
+permissions:
+  id-token: write
+  contents: read
+
 on:
   push:
     branches: [main]

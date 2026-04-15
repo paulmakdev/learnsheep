@@ -25,3 +25,10 @@ terraform apply
 
 ### How to view an output variable
 terraform output $variable_name
+
+### Deploy a specific task definition
+aws ecs update-service --cluster learnsheep-cluster --service learnsheep-backend --task-definition learnsheep-backend:{VERSION_NUMBER_HERE} --force-new-deployment
+
+### If terraform changes aren't showing up correctly, then
+terraform taint RESOURCE_ID, where RESOURCE_ID is something like module.x_module.resource
+Then terraform plan / apply as previous

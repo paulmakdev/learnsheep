@@ -1,0 +1,106 @@
+name: Backend CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+jobs:
+  test-backend:
+    name: Test & Lint Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements-dev.txt
+
+      - name: Run Ruff linter
+        run: cd backend && ruff check app/
+
+      - name: Run Black formatter check
+        run: cd backend && black --check app/
+
+      - name: Run tests with coverage
+        env:
+          DB_SECRET: '{"username":"learnsheep_user","password":"learnsheep_password"}'
+          DB_ENDPOINT: "postgres:5432"
+          DB_NAME: "learnsheep_db"
+          REDIS_HOST_PORT: "redis:6379"
+          REDIS_SECRET: '{"secret_key": "super-secret-key-for-redis-change-in-production"}'
+          JWT_SECRET: '{"secret_key": "super-secret-key-change-this-in-production"}'
+          ALGORITHM: HS256
+          ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+          ENVIRONMENT: test
+        run: |
+          cd backend
+          pytest tests/ -v --cov=app --cov-report=xml --cov-fail-under=75
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v3
+        with:
+          file: backend/coverage.xml
+          fail_ci_if_error: false
+
+  lint-all:
+    name: Lint Entire Repo
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements-dev.txt
+
+      - name: Run Ruff linter
+        run: cd backend && ruff check .
+
+      - name: Run Black formatter check
+        run: cd backend && black --check .
+
+  docker-build:
+    name: Docker Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t learnsheep-backend-test ./backend
+      - name: Verify image starts
+        run: |
+          docker run -d --name test-container \
+            -e DATABASE_URL=postgresql://x:x@localhost/x \
+            -e REDIS_URL=redis://localhost \
+            -e SECRET_KEY=test \
+            -e DB_SECRET='{"username":"learnsheep_user","password":"learnsheep_password"}' \
+            -e DB_ENDPOINT="postgres:5432" \
+            -e DB_NAME="learnsheep_db" \
+            -e REDIS_HOST_PORT="redis:6379" \
+            -e REDIS_SECRET='{"secret_key": "super-secret-test-key-for-redis"}' \
+            -e JWT_SECRET='{"secret_key": "super-secret-test-key"}' \
+            -e ALGORITHM=HS256 \
+            -e ACCESS_TOKEN_EXPIRE_MINUTES=30 \
+            -e ENVIRONMENT=test \
+            learnsheep-backend-test
+          sleep 3
+          docker logs test-container

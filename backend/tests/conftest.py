@@ -12,9 +12,8 @@ import sqlalchemy
 from app.core.cache import get_redis, CacheService
 import redis
 
-
-TEST_DATABASE_URL = "postgresql://test:test@localhost:5433/test_db"
-TEST_REDIS_URL = "redis://localhost:6380"
+TEST_DATABASE_URL = "postgresql://test:test@localhost:5432/test_db"
+TEST_REDIS_URL = "redis://localhost:6379"
 
 engine = create_engine(TEST_DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -23,7 +22,8 @@ test_redis_client = redis.from_url(TEST_REDIS_URL, decode_responses=True)
 
 @pytest.fixture(scope="session", autouse=True)
 def start_db():
-    os.system("docker-compose -f docker-compose.test.yml up -d")
+    # raise Exception("stop here for inspection")
+    os.system("docker compose -f docker-compose.test.yml up -d")
 
     # wait for postgres to actually be ready
     for i in range(20):
@@ -37,7 +37,7 @@ def start_db():
 
     Base.metadata.create_all(bind=engine)
     yield
-    os.system("docker-compose -f docker-compose.test.yml down -v")
+    os.system("docker compose -f docker-compose.test.yml down -v")
 
 
 @pytest.fixture(scope="function")

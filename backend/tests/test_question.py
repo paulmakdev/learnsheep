@@ -146,16 +146,16 @@ def create_and_get_question_2(client, db):
                         {
                             "config": {
                                 "type": "int",
-                                "min": -3,
-                                "max": 3,
+                                "min": -5,
+                                "max": -1,
                             },
                             "name": "difference_maker_x_1",
                         },
                         {
                             "config": {
                                 "type": "int",
-                                "min": -3,
-                                "max": 3,
+                                "min": 1,
+                                "max": 5,
                             },
                             "name": "difference_maker_x_2",
                         },

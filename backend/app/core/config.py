@@ -3,14 +3,46 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
 
-    model_config = SettingsConfigDict(env_file=".env")
+    # Read from environment first, then from .env file (extra="ignore")
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    database_url: str
-    redis_url: str
-    secret_key: str
+    db_secret: str  # injected JSON from AWS
+    db_endpoint: str
+    db_name: str
+    redis_host_port: str
+    redis_secret: str
+    jwt_secret: str
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     environment: str = "development"
+
+    # We use this format so that we can autogenerate creds through Terraform / AWS
+    @property
+    def database_url(self) -> str:
+        import json
+
+        db = json.loads(self.db_secret)
+
+        return (
+            f"postgresql://{db['username']}:{db['password']}"
+            f"@{self.db_endpoint}/{self.db_name}"
+        )
+
+    @property
+    def secret_key(self) -> str:
+        import json
+
+        secret_dict = json.loads(self.jwt_secret)
+        # This should FAIL if not loaded.
+        return secret_dict["secret_key"]
+
+    @property
+    def redis_url(self) -> str:
+        import json
+
+        redis_secret_dict = json.loads(self.redis_secret)
+        key = redis_secret_dict["secret_key"]
+        return f"redis://:{key}@{self.redis_host_port}"
 
 
 settings = Settings()

@@ -6,9 +6,9 @@ services:
       POSTGRES_PASSWORD: test
       POSTGRES_DB: test_db
     ports:
-      - "5433:5432"
+      - "5432:5432"
 
   test_redis:
     image: redis:7
     ports:
-      - "6380:6379"
+      - "6379:6379"

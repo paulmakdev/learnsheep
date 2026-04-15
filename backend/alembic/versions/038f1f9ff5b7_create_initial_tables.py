@@ -9,6 +9,12 @@ Create Date: 2026-03-24 19:24:06.925433
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parents[1]))
+
+from helpers import drop_enum
 
 # revision identifiers, used by Alembic.
 revision = "038f1f9ff5b7"
@@ -367,4 +373,10 @@ def downgrade():
     op.drop_table("question_generator_groups")
     op.drop_table("modules")
     op.drop_table("lessons")
+    drop_enum("generator-type")
+    drop_enum("role")
+    drop_enum("subscription-status")
+    drop_enum("difficulty")
+    drop_enum("billing-frequency")
+    drop_enum("cancel-reason")
     # ### end Alembic commands ###

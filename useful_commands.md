@@ -2,7 +2,7 @@
 ## Docker
 
 ### How to build the backend Docker container from root
-docker build -t learnsheep-backend -f backend/Dockerfile .
+docker build -t learnsheep-backend -f backend/Dockerfile backend/
 
 ### How to start all Docker containers from root
 docker compose up -d

@@ -16,8 +16,8 @@ variable "environment" {
   default     = "production"
 }
 
-#variable "db_password" {
-#  description = "RDS master password — never hardcode this"
-#  type        = string
-#  sensitive   = true
-#}
+variable "alert_email" {
+  description = "Email that will receive resource monitoring alerts"
+  type = string
+  default = "monitoring@learnsheep.com"
+}

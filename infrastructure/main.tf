@@ -80,3 +80,15 @@ module "vpc_endpoints" {
   backend_sg_id = module.ecs.backend_sg_id
   aws_region = var.aws_region
 }
+
+module "monitoring" {
+  source = "./modules/monitoring"
+  project_name = var.project_name
+  aws_region = var.aws_region
+  alert_email = var.alert_email
+  alb_arn_suffix = module.alb.alb_arn_suffix
+  backend_target_arn_suffix = module.alb.backend_target_arn_suffix
+  ecs_service_name = module.ecs.ecs_service_name
+  ecs_cluster_name = module.ecs.ecs_cluster_name
+  db_id = module.rds.db_id
+}

@@ -163,6 +163,10 @@ resource "aws_ecs_service" "backend" {
     container_name   = "backend"
     container_port   = 8000
   }
+
+  lifecycle {
+    ignore_changes = [task_definition]
+  }
 }
 
 # This is the security group for the backend

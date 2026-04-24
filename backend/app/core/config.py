@@ -20,12 +20,16 @@ class Settings(BaseSettings):
     @property
     def database_url(self) -> str:
         import json
+        from urllib.parse import quote_plus
 
         db = json.loads(self.db_secret)
 
+        # We HAVE to have proper quoting because generated pword can have symbols
+        username = quote_plus(db["username"])
+        password = quote_plus(db["password"])
+
         return (
-            f"postgresql://{db['username']}:{db['password']}"
-            f"@{self.db_endpoint}/{self.db_name}"
+            f"postgresql://{username}:{password}" f"@{self.db_endpoint}/{self.db_name}"
         )
 
     @property

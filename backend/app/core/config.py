@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     jwt_secret: str
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
+    refresh_token_idle_expire_seconds: int = 604800
     environment: str = "development"
 
     # We use this format so that we can autogenerate creds through Terraform / AWS

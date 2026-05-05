@@ -24,11 +24,16 @@ class Progress(Base):
     questions_correct = Column(Integer, default=0)
     questions_incorrect = Column(Integer, default=0)
     understanding_metadata = Column(JSONB)
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    updated_at = Column(
+        DateTime(timezone=True), onupdate=func.now(), default=func.now()
+    )
+    created_at = Column(DateTime(timezone=True), default=func.now())
 
     __table_args__ = (
         # To get per-lesson history and user general history easily
         Index("idx_user_lesson", "user_id", "lesson_id"),
         # If we ever want to get some per-lesson stats
         Index("idx_lesson", "lesson_id"),
+        # To get most recently accessed lessons
+        Index("idx_user_updated_at", "user_id", "updated_at"),
     )

@@ -212,8 +212,6 @@ def test_answer_question_correct(create_and_get_question, client, db, cache):
     current_user_id = db.query(User.id).filter(User.email == "test@test.com").scalar()
     stored_question = cache.get(session_token + ":" + str(current_user_id))
     stored_question_json = json.loads(stored_question)
-    if stored_question is None:
-        print("oh no")
     correct_answers = stored_question_json["answer_dict"]["answers"]
     answer = correct_answers[0]
     response = client.post(
@@ -234,8 +232,7 @@ def test_answer_question_incorrect(create_and_get_question_2, client, db, cache)
     current_user_id = db.query(User.id).filter(User.email == "test@test.com").scalar()
     stored_question = cache.get(session_token + ":" + str(current_user_id))
     stored_question_json = json.loads(stored_question)
-    if stored_question is None:
-        print("oh no")
+
     choices = stored_question_json["answer_dict"]["choices"]
     answer = choices[0]
     if answer in stored_question_json["answer_dict"]["answers"]:

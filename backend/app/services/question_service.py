@@ -38,7 +38,7 @@ def get_question(
     answer_dict = get_choices_answers_variables_replaced(
         question, variable_replacement_dict
     )
-    print(question)
+
     question_expression = get_question_expression_variables_replaced(
         question, variable_replacement_dict
     )
@@ -244,7 +244,7 @@ def get_question_expression_variables_replaced(
             question_expression = re.sub(
                 rf"\b{re.escape(str(variable))}\b", str(value), question_expression
             )
-        print(question_expression)
+
         return question_expression
 
     return ""

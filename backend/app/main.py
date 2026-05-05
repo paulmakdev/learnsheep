@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.auth import router as auth_router
 from app.api.question import router as question_router
+from app.api.me import router as me_router
+from app.api.stat import router as stat_router
 
 app = FastAPI(
     title="Learnsheep API",
@@ -11,6 +13,9 @@ app = FastAPI(
 
 app.include_router(auth_router, prefix="/api")
 app.include_router(question_router, prefix="/api")
+app.include_router(me_router, prefix="/api")
+app.include_router(stat_router, prefix="/api")
+
 
 app.add_middleware(
     CORSMiddleware,

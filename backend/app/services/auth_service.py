@@ -17,7 +17,6 @@ from app.core.security import (
     create_uuid4_compact,
 )
 from app.core.cache import CacheService
-import json
 from app.schemas.info import DeviceInfo
 
 
@@ -161,9 +160,7 @@ def revoke_session_with_public_id(
             private_session_id = public_to_private_ids[revocation_id]
             session_info = cache.get("session:" + private_session_id)
             session_info["revoked"] = True
-            cache.set_preserve_ttl(
-                "session:" + private_session_id, json.dumps(session_info)
-            )
+            cache.set_preserve_ttl("session:" + private_session_id, session_info)
             cache.srem("user:" + str(current_user.id) + ":sessions", private_session_id)
             revoked_ids.append(revocation_id)
 

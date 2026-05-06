@@ -12,8 +12,14 @@ class Base(DeclarativeBase):
 
 
 def get_db():
+    print(">>> get_db: opening session")
     db = SessionLocal()
     try:
         yield db
+        print(">>> get_db: after yield, no error")
+    except Exception as e:
+        print(f">>> get_db: exception caught: {e}")
+        raise
     finally:
+        print(">>> get_db: closing session")
         db.close()

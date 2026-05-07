@@ -3,7 +3,15 @@ import redis
 from typing import Any, Optional, Set
 from app.core.config import settings
 
-redis_client = redis.from_url(settings.redis_url, decode_responses=True)
+redis_client = redis.from_url(
+    settings.redis_url,
+    decode_responses=True,
+    # So we don't hang
+    socket_connect_timeout=3,
+    socket_timeout=3,
+    retry_on_timeout=True,
+    health_check_interval=30,
+)
 
 
 def get_redis():

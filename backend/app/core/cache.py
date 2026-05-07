@@ -15,7 +15,7 @@ redis_client = redis.from_url(
 
 
 def get_redis():
-    return redis_client
+    return CacheService(redis_client)
 
 
 class CacheService:

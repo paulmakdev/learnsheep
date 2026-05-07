@@ -70,32 +70,19 @@ def login_user(
             "Invalid credentials"
         )  # Same error for both cases — intentional
 
-    print("made it this far 1")
-
     session_dict = create_access_token_dict(user_id=str(user.id))
-
-    print("made it this far 2")
-
     access_token = create_access_token(session_dict)
-
-    print("made it this far 3")
 
     # remove all old sessions because we want to make sure we don't get a bloated list from many logins
     current_session_ids = cache.smembers("user:" + str(user.id) + ":sessions")
-
-    print("made it this far 4")
 
     if current_session_ids:
         for session_id in current_session_ids:
             if not cache.get("session:" + session_id):
                 cache.srem("user:" + str(user.id) + ":sessions", session_id)
 
-    print("made it this far 5")
-
     session_holder_ttl = max(session_dict["mea"] - session_dict["lra"], 1)
     session_ttl = max(int((session_dict["iea"] - session_dict["lra"]) * 1.5), 1)
-
-    print("made it this far 6")
 
     cache.sadd(
         "user:" + str(user.id) + ":sessions",
@@ -103,19 +90,13 @@ def login_user(
         ttl=session_holder_ttl,
     )
 
-    print("made it this far 7")
-
     session_info = {
         "device_info": device_info,
         "iat": session_dict["iat"],
         "revoked": False,
     }
 
-    print("made it this far 8")
-
     cache.set("session:" + session_dict["sid"], session_info, ttl=session_ttl)
-
-    print("made it this far 9")
 
     return {"access_token": access_token, "access_token_type": "bearer"}
 

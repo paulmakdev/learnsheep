@@ -6,6 +6,7 @@ from app.core.config import settings
 redis_client = redis.from_url(
     settings.redis_url,
     decode_responses=True,
+    ssl_cert_reqs=None,  # AWS has internal certs
     # So we don't hang
     socket_connect_timeout=3,
     socket_timeout=3,

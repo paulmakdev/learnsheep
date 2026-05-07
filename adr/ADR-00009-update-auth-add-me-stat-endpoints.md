@@ -30,5 +30,7 @@ Decided to create a function that generates public session ids and links them to
 
 Fixed a bug where we weren't wrapping our redis connection with our wrapper in production.
 
+Changed redis link to use "rediss" for SSL, as we made it required.
+
 ## Future Decisions
 Do we add DB logging for sessions? Do we care? Will this help us with analysis, or better yet, security analysis?

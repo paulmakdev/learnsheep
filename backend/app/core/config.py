@@ -47,7 +47,7 @@ class Settings(BaseSettings):
 
         redis_secret_dict = json.loads(self.redis_secret)
         key = redis_secret_dict["secret_key"]
-        return f"redis://:{key}@{self.redis_host_port}"
+        return f"rediss://:{key}@{self.redis_host_port}"
 
 
 settings = Settings()

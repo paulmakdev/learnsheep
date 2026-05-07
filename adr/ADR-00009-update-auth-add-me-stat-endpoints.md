@@ -28,5 +28,7 @@ Added logic so that we store device information and login time with session ids 
 Decided to create a function that generates public session ids and links them to private session ids internally when a user requests it
 - Allows us to keep our internal logic separate, while still having unique session ids
 
+Fixed a bug where we weren't wrapping our redis connection with our wrapper in production.
+
 ## Future Decisions
 Do we add DB logging for sessions? Do we care? Will this help us with analysis, or better yet, security analysis?

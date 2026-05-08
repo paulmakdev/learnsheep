@@ -9,14 +9,21 @@ from app.core.security import get_current_time_seconds, decode_token
 from app.schemas.auth import TokenClaim
 from app.core.cache import get_redis, CacheService
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
 
 
 def get_token_claim(
-    token: str = Depends(oauth2_scheme), cache: CacheService = Depends(get_redis)
+    request: Request,
+    cache: CacheService = Depends(get_redis),
+    token: str = Depends(oauth2_scheme),
 ) -> User:
     try:
-        payload = decode_token(token)
+        session_token = request.cookies.get("access_token")
+        resolved_token = session_token or token
+        if not resolved_token:
+            raise ValueError("Invalid token")
+        # rest of your existing logic using resolved_token
+        payload = decode_token(resolved_token)
         token_claim = TokenClaim.model_validate(payload)
         now = get_current_time_seconds()
 

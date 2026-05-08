@@ -27,6 +27,32 @@ def registered_user(client):
     }
 
 
+@pytest.fixture
+def registered_web_user(client):
+    base_registered_user_email = "test@example.com"
+    base_registered_user_password = "mypassword123"
+    response = client.post(
+        "/api/auth/register-web",
+        json={
+            "email": base_registered_user_email,
+            "password": base_registered_user_password,
+        },
+    )
+    yield {
+        "response": response,
+        "email": base_registered_user_email,
+        "password": base_registered_user_password,
+    }
+
+
+def test_register_web_success(client, registered_web_user):
+    response = registered_web_user["response"]
+    assert response.status_code == 201
+    assert "access_token" not in response.json()
+    assert "Set-Cookie" in response.headers
+    assert "access_token" in response.cookies
+
+
 def test_register_success(client, registered_user):
     response = registered_user["response"]
     assert response.status_code == 201
@@ -94,6 +120,23 @@ def test_access_rotation(client, registered_user):
     )
 
 
+def test_access_rotation_web(client, registered_web_user):
+    register_response = registered_web_user["response"]
+
+    refresh_response = client.post(
+        "/api/auth/refresh-web",
+        cookies={"access_token": register_response.cookies["access_token"]},
+    )
+
+    assert refresh_response.status_code == 200
+    assert "access_token" not in refresh_response.json()
+    assert "access_token" in refresh_response.cookies
+    assert (
+        refresh_response.cookies["access_token"]
+        != register_response.cookies["access_token"]
+    )
+
+
 @pytest.fixture
 def test_getting_public_id(client, registered_user):
     register_response = registered_user["response"]
@@ -138,6 +181,49 @@ def test_revocation(client, test_getting_public_id):
     me_response_should_fail = client.get(
         "/api/me/info",
         headers={"Authorization": f"Bearer {should_be_revoked_access_token}"},
+    )
+
+    assert me_response_should_fail.status_code == 401
+
+
+@pytest.fixture
+def test_getting_public_id_web(client, registered_web_user):
+    register_response = registered_web_user["response"]
+    access_token_cookie = register_response.cookies["access_token"]
+
+    sessions_info_response = client.post(
+        "/api/auth/sessions-info",
+        cookies={"access_token": access_token_cookie},
+    )
+
+    assert sessions_info_response.status_code == 200
+    assert "sessions" in sessions_info_response.json()
+
+    return {
+        "session_info_json": sessions_info_response.json(),
+        "register_response_cookie": access_token_cookie,
+    }
+
+
+def test_revocation_web(client, test_getting_public_id_web):
+    sessions_info_response_json = test_getting_public_id_web["session_info_json"]
+    access_token_cookie = test_getting_public_id_web["register_response_cookie"]
+
+    assert len(sessions_info_response_json.get("sessions", [])) > 0
+    session_id = sessions_info_response_json.get("sessions")[0].get("session_id", "")
+
+    revoke_response = client.post(
+        "/api/auth/revoke-sessions",
+        cookies={"access_token": access_token_cookie},
+        json={"ids_to_revoke": [session_id]},
+    )
+
+    assert revoke_response.status_code == 200
+    assert revoke_response.json().get("revoked_ids", ["null"])[0] == session_id
+
+    me_response_should_fail = client.get(
+        "/api/me/info",
+        cookies={"access_token": access_token_cookie},
     )
 
     assert me_response_should_fail.status_code == 401

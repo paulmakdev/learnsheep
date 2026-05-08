@@ -5,6 +5,7 @@ import time
 import uuid
 import base64
 from app.schemas.auth import TokenClaim
+from fastapi import Response
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -61,3 +62,20 @@ def update_access_token_dict(access_token_dict, max_idle_seconds=60 * 60 * 24 * 
     access_token_dict.lra = now
     access_token_dict.iea = min(now + max_idle_seconds, access_token_dict.mea)
     return access_token_dict
+
+
+def set_auth_cookie(response: Response, access_token: str):
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        domain=(
+            "api.learnsheep.com"
+            if settings.environment == "production"
+            else "localhost"
+        ),
+        path="/",
+        httponly=True,
+        secure=True,
+        samesite="strict",
+        max_age=3600,
+    )

@@ -28,6 +28,15 @@ Added logic so that we store device information and login time with session ids 
 Decided to create a function that generates public session ids and links them to private session ids internally when a user requests it
 - Allows us to keep our internal logic separate, while still having unique session ids
 
+Decided to have separate routes for web vs. other auth.
+- i.e. login-web and login
+- For maximum security, web browsers will use a same-site, httponly, strict cookie
+- If want to eventually make an app or non-web-based, then can use regular auth
+- Prevents us from having to deal with sending and storing the token securely in js
+    - The cookie will automatically restrict requests to the domain and prevent cross site scripting, based on the settings
+- They both use the same functions as before, they just return different values
+    - Non-cookie returns dict with access_token, other one returns just "ok": true
+
 Fixed a bug where we weren't wrapping our redis connection with our wrapper in production.
 
 Changed redis link to use "rediss" for SSL, as we made it required.

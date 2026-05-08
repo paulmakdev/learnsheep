@@ -18,6 +18,10 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
+class OkResponse(BaseModel):
+    ok: bool
+
+
 class UserResponse(BaseModel):
 
     model_config = SettingsConfigDict(from_attributes=True)

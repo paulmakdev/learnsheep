@@ -9,13 +9,16 @@ permissions:
 
 env:
   AWS_REGION: us-east-2
-  AWS_WEBSITE_ROLE_ARN: ${{ secrets.AWS_WEBSITE_ROLE_ARN_PROD }}
-  CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_PROD }}
-  S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME_PROD }}
+  AWS_WEBSITE_ROLE_ARN: ${{ secrets.AWS_WEBSITE_ROLE_ARN_DEV }}
+  CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_DEV }}
+  S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME_DEV }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
 
     steps:
       - name: Checkout
@@ -26,6 +29,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -38,7 +42,6 @@ jobs:
         with:
           role-to-assume: ${{ env.AWS_WEBSITE_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
-          # No access key / secret key needed — OIDC handles it
 
       - name: Sync to S3
         run: |

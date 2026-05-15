@@ -24,7 +24,8 @@ app.include_router(stat_router, prefix="/api")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",
+        "https://dev.learnsheep.com",
+        "https://learnsheep.com",
         *(["https://localhost:3000"] if settings.environment != "production" else []),
     ],
     allow_credentials=True,

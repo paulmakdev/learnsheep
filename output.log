@@ -1,0 +1,7 @@
+ Container learnsheep_redis Running
+ Container learnsheep_postgres Running
+ Container learnsheep_backend Running
+Attaching to learnsheep_backend, learnsheep_postgres, learnsheep_redis
+ Container learnsheep_postgres Waiting
+ Container learnsheep_postgres Healthy
+learnsheep_backend  | INFO:     172.20.0.1:51872 - "POST /api/auth/login-web HTTP/1.1" 401 Unauthorized

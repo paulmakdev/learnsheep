@@ -37,8 +37,17 @@ def get_current_time_seconds():
 
 
 def create_access_token_dict(
-    user_id, max_idle_seconds=60 * 60 * 24 * 7, max_life_seconds=60 * 60 * 24 * 30
+    user_id,
+    max_idle_seconds=None,
+    max_life_seconds=60 * 60 * 24 * 30,
+    is_temp_user=False,
 ) -> TokenClaim:
+    # We get the max idle seconds this way so we are getting access_token_expire_minutes at run time
+    max_idle_seconds = (
+        max_idle_seconds
+        if max_idle_seconds
+        else settings.access_token_expire_minutes * 60
+    )
     now = get_current_time_seconds()
     access_token_dict = {
         # session id
@@ -50,9 +59,11 @@ def create_access_token_dict(
         # last refreshed at
         "lra": now,
         # idle expire at
-        "iea": now + min(settings.access_token_expire_minutes * 60, max_life_seconds),
+        "iea": now + min(max_idle_seconds, max_life_seconds),
         # max expire at
         "mea": now + max_life_seconds,
+        # is temp user
+        "itu": is_temp_user,
     }
     return access_token_dict
 

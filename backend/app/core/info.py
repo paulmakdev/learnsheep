@@ -8,6 +8,7 @@ from app.schemas.info import DeviceInfo
 from app.core.security import get_current_time_seconds, decode_token
 from app.schemas.auth import TokenClaim
 from app.core.cache import get_redis, CacheService
+from typing import Optional
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
 
@@ -16,7 +17,7 @@ def get_token_claim(
     request: Request,
     cache: CacheService = Depends(get_redis),
     token: str = Depends(oauth2_scheme),
-) -> User:
+) -> TokenClaim:
     try:
         session_token = request.cookies.get("access_token")
         resolved_token = session_token or token
@@ -66,3 +67,16 @@ def get_device_info(request: Request) -> DeviceInfo:
         "os_version": ua.os.version_string,
         "device": ua.device.family,
     }
+
+
+def get_token_claim_non_blocking(
+    request: Request,
+    cache: CacheService = Depends(get_redis),
+    token: str = Depends(oauth2_scheme),
+) -> Optional[TokenClaim]:
+    try:
+        token_claim = get_token_claim(request, cache, token)
+    except Exception:
+        return None
+
+    return token_claim

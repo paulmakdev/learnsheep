@@ -32,3 +32,9 @@ aws ecs update-service --cluster learnsheep-cluster --service learnsheep-backend
 ### If terraform changes aren't showing up correctly, then
 terraform taint RESOURCE_ID, where RESOURCE_ID is something like module.x_module.resource
 Then terraform plan / apply as previous
+
+### To make the website
+Add -var-file={file_name}, where file_name is web.tfvars
+
+### To deploy a specific module (e.g. for prod vs dev website)
+terraform apply -target={module}, where module could be module.website_dev

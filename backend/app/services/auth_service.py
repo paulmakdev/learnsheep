@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import update
 from app.models.user import User
 from app.schemas.auth import (
     RegisterRequest,
@@ -18,22 +19,53 @@ from app.core.security import (
 )
 from app.core.cache import CacheService
 from app.schemas.info import DeviceInfo
+from typing import Optional
 
 
 def register_user(
-    db: Session, cache: CacheService, data: RegisterRequest, device_info: DeviceInfo
+    db: Session,
+    cache: CacheService,
+    data: RegisterRequest,
+    device_info: DeviceInfo,
+    token_claim: Optional[TokenClaim] = None,
 ) -> TokenResponse:
     existing = db.query(User).filter(User.email == data.email).first()
     if existing:
         raise ValueError("Email already registered")
 
-    user = User(
-        email=data.email,
-        # bcrypt automatically salts the password, pretty neat, it is part of the output
-        hashed_salted_password=hash_password(data.password),
-        display_name=data.display_name or data.email.split("@")[0],
-    )
-    db.add(user)
+    # If someone has a token, and they are a guest user, then they shouldn't be registering again.
+    if token_claim and not token_claim.itu:
+        raise ValueError("No double registers.")
+
+    if token_claim:
+        # If the user already has a guest token, then continue.
+        stmt = (
+            update(User)
+            .where(User.id == token_claim.uid)
+            .values(
+                email=data.email,
+                hashed_salted_password=hash_password(data.password),
+                display_name=data.display_name or data.email.split("@")[0],
+                is_pre_login=False,
+            )
+            .returning(User)
+        )
+        result = db.execute(stmt)
+        user = result.scalar_one()
+
+        # Remove ALL pre-registration / login sessions.
+        cache.delete("user:" + str(token_claim.uid) + ":sessions")
+        cache.delete("session:" + str(token_claim.sid))
+    else:
+        user = User(
+            email=data.email,
+            # bcrypt automatically salts the password, pretty neat, it is part of the output
+            hashed_salted_password=hash_password(data.password),
+            display_name=data.display_name or data.email.split("@")[0],
+        )
+
+        db.add(user)
+
     db.commit()
     db.refresh(user)
 
@@ -165,3 +197,39 @@ def revoke_session_with_public_id(
             revoked_ids.append(revocation_id)
 
     return {"revoked_ids": revoked_ids}
+
+
+def make_temp_user(
+    db: Session, cache: CacheService, device_info: DeviceInfo
+) -> TokenResponse:
+
+    user = User(display_name="you", is_pre_login=True)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    # We will give a user up to 30 days to register
+    session_dict = create_access_token_dict(
+        user_id=str(user.id), max_idle_seconds=60 * 60 * 24 * 30, is_temp_user=True
+    )
+    access_token = create_access_token(session_dict)
+
+    session_holder_ttl = max(session_dict["mea"] - session_dict["lra"], 1)
+    session_ttl = max(int((session_dict["iea"] - session_dict["lra"]) * 1.5), 1)
+
+    cache.sadd(
+        "user:" + str(user.id) + ":sessions",
+        session_dict["sid"],
+        ttl=session_holder_ttl,
+    )
+
+    session_info = {
+        "device_info": device_info,
+        "iat": session_dict["iat"],
+        "revoked": False,
+        "itu": True,
+    }
+
+    cache.set("session:" + session_dict["sid"], session_info, ttl=session_ttl)
+
+    return {"access_token": access_token, "access_token_type": "bearer"}

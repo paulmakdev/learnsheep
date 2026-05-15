@@ -4,6 +4,10 @@ from app.api.auth import router as auth_router
 from app.api.question import router as question_router
 from app.api.me import router as me_router
 from app.api.stat import router as stat_router
+import logging
+from app.core.config import settings
+
+logging.basicConfig(level=logging.DEBUG)
 
 app = FastAPI(
     title="Learnsheep API",
@@ -19,7 +23,10 @@ app.include_router(stat_router, prefix="/api")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        *(["https://localhost:3000"] if settings.environment != "production" else []),
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

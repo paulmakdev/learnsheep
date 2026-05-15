@@ -47,6 +47,7 @@ class TokenClaim(BaseModel):
     mea: int = Field(
         description="Max expires at -- when the user MUST login again for access (Unix timestamp in seconds)"
     )
+    itu: bool = Field(description="Is this a pre-login token or not")
 
 
 class PublicSessionResponse(BaseModel):

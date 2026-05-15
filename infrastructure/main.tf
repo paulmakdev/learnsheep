@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 5.0"
+    }
   }
 }
 
@@ -91,4 +95,36 @@ module "monitoring" {
   ecs_service_name = module.ecs.ecs_service_name
   ecs_cluster_name = module.ecs.ecs_cluster_name
   db_id = module.rds.db_id
+}
+
+module "website_dev" {
+  source = "./modules/website"
+  bucket_name = var.website_bucket_name_dev
+  domain_name = var.website_domain_name_dev
+  sub_domain = var.website_sub_domain_dev
+
+  github_org = var.github_org
+  github_repo = var.github_repo
+  project_name = var.project_name
+  aws_region=var.aws_region
+
+  providers = {
+    cloudflare = cloudflare
+  }
+}
+
+module "website_prod" {
+  source = "./modules/website"
+  bucket_name = var.website_bucket_name_prod
+  domain_name = var.website_domain_name_prod
+  sub_domain = var.website_sub_domain_prod
+
+  github_org = var.github_org
+  github_repo = var.github_repo
+  project_name = var.project_name
+  aws_region=var.aws_region
+
+  providers = {
+    cloudflare = cloudflare
+  }
 }

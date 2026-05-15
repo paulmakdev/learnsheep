@@ -278,3 +278,52 @@ def test_access_expiration(client, monkeypatch):
     )
 
     assert fourth_response.status_code == 200
+
+
+@pytest.fixture
+def making_temp_web(client):
+    register_response = client.post("/api/auth/temp-credentials-web")
+    assert register_response.status_code == 201
+
+    access_token_cookie = register_response.cookies["access_token"]
+
+    info_response = client.post(
+        "/api/auth/sessions-info",
+        cookies={"access_token": access_token_cookie},
+    )
+
+    assert info_response.status_code == 200
+    assert info_response.json()["sessions"][0]["session_info"]["itu"]
+
+    yield {"access_token_cookie": access_token_cookie}
+
+
+def test_register_temp_web(client, making_temp_web):
+    access_token_cookie = making_temp_web["access_token_cookie"]
+    base_registered_user_email = "test@example.com"
+    base_registered_user_password = "mypassword123"
+    official_registration_response = client.post(
+        "/api/auth/register-web",
+        json={
+            "email": base_registered_user_email,
+            "password": base_registered_user_password,
+        },
+        cookies={"access_token": access_token_cookie},
+    )
+    assert official_registration_response.status_code == 201
+
+    # Make sure that the old token is invalidated
+    old_token_response = client.get(
+        "api/me/info", cookies={"access_token": access_token_cookie}
+    )
+
+    assert old_token_response.status_code == 401
+
+    new_token_response = client.get(
+        "api/me/info",
+        cookies={
+            "access_token": official_registration_response.cookies["access_token"]
+        },
+    )
+
+    assert new_token_response.status_code == 200

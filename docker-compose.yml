@@ -1,4 +1,10 @@
 services:
+  cert-generator:
+    image: alpine/openssl
+    volumes:
+      - ./tls:/tls
+    command: req -x509 -newkey rsa:4096 -keyout /tls/redis.key -out /tls/redis.crt -days 365 -nodes -subj '/CN=redis'
+
   postgres:
     image: postgres:15
     container_name: learnsheep_postgres
@@ -17,10 +23,32 @@ services:
       retries: 5
 
   redis:
+    depends_on:
+      cert-generator:
+        condition: service_completed_successfully
     image: redis:7-alpine
     container_name: learnsheep_redis
+    command: >
+          sh -c "redis-server
+          --requirepass supersecretpassword
+          --tls-port 6379
+          --port 0
+          --tls-cert-file /tls/redis.crt
+          --tls-key-file /tls/redis.key
+          --tls-ca-cert-file /tls/redis.crt
+          --tls-auth-clients no"
+    volumes:
+      - ./tls:/tls
     ports:
       - '6379:6379'
+
+  backend-cert-generator:
+      image: alpine/openssl
+      user: root
+      volumes:
+        - ./tls:/tls
+      entrypoint: >
+        sh -c "openssl req -x509 -newkey rsa:4096 -keyout /tls/api.key -out /tls/api.crt -days 365 -nodes -subj '/CN=localhost' && chmod 644 /tls/api.crt && chmod 644 /tls/api.key"
 
   backend:
     build: ./backend
@@ -34,8 +62,11 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      backend-cert-generator:
+        condition: service_completed_successfully
     volumes:
-      - ./backend/app:/app/app  # Hot reload in dev
+      - ./backend/app:/app/app
+      - ./tls:/tls
 
 volumes:
   postgres_data:

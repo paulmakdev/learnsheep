@@ -1,0 +1,44 @@
+<svg width="150" xmlns="http://www.w3.org/2000/svg" height="150" id="screenshot-7c00b493-4652-8049-8007-e6685251c247" viewBox="654 407 150 150" style="-webkit-print-color-adjust::exact" xmlns:xlink="http://www.w3.org/1999/xlink" fill="none" version="1.1">
+  <style>
+  </style>
+  <g id="shape-7c00b493-4652-8049-8007-e6685251c247" rx="0" ry="0">
+    <g id="shape-7c00b493-4652-8049-8007-e66841c4f122" rx="0" ry="0">
+      <g id="shape-7c00b493-4652-8049-8007-e667d1807e70">
+        <g class="fills" id="fills-7c00b493-4652-8049-8007-e667d1807e70">
+          <rect rx="0" ry="0" x="654" y="407" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" width="150" height="150" style="fill:#4a8c38;fill-opacity:1">
+          </rect>
+        </g>
+      </g>
+      <g id="shape-7c00b493-4652-8049-8007-e667d180bba2">
+        <g transform="matrix(0.000000, -1.000000, 1.000000, 0.000000, 205.000000, 1186.000000)" class="text-container" x="673" y="447" width="45" height="87.00000000000011" rx="0" ry="0">
+          <defs>
+            <pattern patternUnits="objectBoundingBox" width="44.359375" height="87" id="fill-0-render-59-0">
+              <g>
+                <rect width="44.359375" height="87" style="fill:#ffffff;fill-opacity:1">
+                </rect>
+              </g>
+            </pattern>
+          </defs>
+          <g class="fills" id="fills-7c00b493-4652-8049-8007-e667d180bba2">
+            <text x="673" y="533" dominant-baseline="ideographic" textLength="44.359375" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Fredoka;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:72px;text-decoration:none;direction:ltr;fill:#ffffff;fill-opacity:1">&#x27; &#x27;</text>
+          </g>
+        </g>
+      </g>
+      <g id="shape-7c00b493-4652-8049-8007-e667d180bba3">
+        <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="701" y="401" width="62" height="130" rx="0" ry="0">
+          <defs>
+            <pattern patternUnits="objectBoundingBox" width="61.671875" height="130" id="fill-0-render-60-0">
+              <g>
+                <rect width="61.671875" height="130" style="fill:#f5f0e0;fill-opacity:1">
+                </rect>
+              </g>
+            </pattern>
+          </defs>
+          <g class="fills" id="fills-7c00b493-4652-8049-8007-e667d180bba3">
+            <text x="701" y="530" dominant-baseline="ideographic" textLength="61.671875" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Fredoka;letter-spacing:normal;font-style:normal;font-weight:700;white-space:pre;font-size:108px;text-decoration:none;direction:ltr;fill:#f5f0e0;fill-opacity:1">¶</text>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

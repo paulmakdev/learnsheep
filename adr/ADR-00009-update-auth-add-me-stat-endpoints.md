@@ -1,4 +1,4 @@
-# ADR-00008: Updating auth and adding me and stat endpoints.
+# ADR-00009: Updating auth and adding me and stat endpoints.
 
 ## Status
 Accepted

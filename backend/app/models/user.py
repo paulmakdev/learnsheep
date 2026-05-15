@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, DateTime, Enum
+from sqlalchemy import Column, String, DateTime, Enum, Boolean, CheckConstraint
 import enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
@@ -19,8 +19,8 @@ class User(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     anonymous_id = Column(UUID(as_uuid=True), default=uuid.uuid4)
-    email = Column(String, unique=True, nullable=False, index=True)
-    hashed_salted_password = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=True, index=True)
+    hashed_salted_password = Column(String, nullable=True)
     role = Column(Enum(Role, name="role"), nullable=False, default=Role.STUDENT)
     display_name = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -28,3 +28,16 @@ class User(Base):
     user_source = Column(String)
     gdpr_consent_at = Column(DateTime(timezone=True), nullable=True)
     data_deletion_requested_at = Column(DateTime(timezone=True), nullable=True)
+    is_pre_login = Column(Boolean, nullable=False, default=False)
+
+    __table_args__ = (
+        # This constraint allows us to track a user even if they choose to NOT login.
+        CheckConstraint(
+            """
+            (is_pre_login = true AND email IS NULL AND hashed_salted_password IS NULL)
+            OR
+            (is_pre_login = false AND email IS NOT NULL AND hashed_salted_password IS NOT NULL)
+            """,
+            name="valid_user_state",
+        ),
+    )

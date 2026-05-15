@@ -1,5 +1,6 @@
 *.tfvars
 *.env
+*.env.*
 
 # Terraform core
 .terraform/
@@ -54,3 +55,6 @@ ecs*update-service*
 # Just in case
 *secret*
 *credentials*
+
+# For testing
+tls/

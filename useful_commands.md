@@ -38,3 +38,14 @@ Add -var-file={file_name}, where file_name is web.tfvars
 
 ### To deploy a specific module (e.g. for prod vs dev website)
 terraform apply -target={module}, where module could be module.website_dev
+
+## Alembic
+
+### To create a new revision
+alembic revision --autogenerate -m "message"
+
+### To upgrade to newest revision
+alembic upgrade head
+
+### To downgrade to oldest revision
+alembic downgrade base

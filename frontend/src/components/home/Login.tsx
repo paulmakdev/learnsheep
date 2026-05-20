@@ -2,8 +2,6 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../features/user/userSlice";
 
-const API_URL = import.meta.env.VITE_API_URL
-
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -63,7 +61,7 @@ export default function Login() {
     if (!email || !password) return alert("Fill all fields");
 
     try {
-      const res = await fetch(`${API_URL}/api/auth/register-web`, {
+      const res = await fetch(`/api/auth/register-web`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

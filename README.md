@@ -1,6 +1,4 @@
-<div style="display: flex; height: 100%; font-size: clamp(.8rem,2vw,4vh);"><div style="width: 15vw; padding-right: 8vh; padding-top: 2vh; padding-bottom: 0px; display: flex;"><img alt="Learnsheep Sheep happily looking out at title." src="frontend/public/learnsheep_sheep.png" style="image-rendering: pixelated; width: 100%; max-height: 100%; object-fit: contain; object-position: center bottom;"></div><div style="display: flex; color: var(--dark); flex-direction: column; max-height: 100%; justify-content: end;"><p class="sub-title" style="margin: 0px; opacity: 0.5; ">The super not secret code of</p><h1 class="big-title" style="margin: 0px;">Learnsheep</h1><p class="highlighted-sub-title sub-title" style="margin-bottom: 0px; margin-top: var(--mini-padding); color: #e8b84b">App architecture is for everyone, even sheep.</p></div></div>
-
-<br></br>
+![Learnsheep sheep saying that app architecture is for everybody.](static-readme-assets/learnsheep_transparent_architecture_image.png)
 
 Visit us live at [https://learnsheep.com](https://learnsheep.com)
 
@@ -16,6 +14,7 @@ Visit us live at [https://learnsheep.com](https://learnsheep.com)
             - [Backend Infrastructure](#api-infrastructure)
 - [The App Itself and Decision Logs](#the-app-itself-and-decision-logs)
 - [Usage of Repository](#usage)
+- [Final Message](#final-message)
 
 
 # Learnsheep's Mission
@@ -49,6 +48,7 @@ Why Infrastructure as Code?
 - No need to chase down settings someone made 7 years ago
 - Allows us to scale as needed
 - Easy to keep track of changes
+
 Why Terraform?
 - Terraform is an industry standard for managing AWS infrastructure, it is well-made, and free to use (for our case, at time of writing)
 - Very easy to break down infrastructure into modules
@@ -186,3 +186,8 @@ I ask that you do not directly copy this code or train models on it.
 I reserve the right to make any and all changes to this repository.
 
 As always, everyone always has the right to take ideas, think about them, and change them to suit their needs. Inspiration is always welcome and is a fundamental part of the mission of Learnsheep. I ask that you use good judgement :).
+
+# Final Message
+Learning is for everybody, even sheep, and even you. You can do it. I believe in you.
+
+[Table of Contents](#table-of-contents)

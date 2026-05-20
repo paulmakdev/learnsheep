@@ -28,7 +28,9 @@ class User(Base):
     user_source = Column(String)
     gdpr_consent_at = Column(DateTime(timezone=True), nullable=True)
     data_deletion_requested_at = Column(DateTime(timezone=True), nullable=True)
-    is_pre_login = Column(Boolean, nullable=False, default=False)
+    is_pre_login = Column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
 
     __table_args__ = (
         # This constraint allows us to track a user even if they choose to NOT login.

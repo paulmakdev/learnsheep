@@ -1,7 +1,8 @@
 from logging.config import fileConfig
-from sqlalchemy import create_engine
-from sqlalchemy import pool
+from sqlalchemy import create_engine, CheckConstraint, pool
 from alembic import context
+from alembic.autogenerate import comparators, renderers
+from alembic.operations import ops
 import importlib
 import pkgutil
 from pathlib import Path
@@ -26,9 +27,65 @@ config = context.config
 fileConfig(config.config_file_name)
 
 
+# --- Check constraint autogenerate support ---
+
+
+@comparators.dispatch_for("table")
+def compare_check_constraints(
+    autogen_context, modify_table_ops, schema, tname, conn_table, metadata_table
+):
+    if metadata_table is None:
+        return
+
+    metadata_checks = {
+        c.name: c
+        for c in metadata_table.constraints
+        if isinstance(c, CheckConstraint) and c.name
+    }
+
+    db_checks = (
+        {
+            c.name: c
+            for c in conn_table.constraints
+            if isinstance(c, CheckConstraint) and c.name
+        }
+        if conn_table is not None
+        else {}
+    )
+
+    for name, constraint in metadata_checks.items():
+        if name not in db_checks:
+            modify_table_ops.ops.append(
+                ops.CreateCheckConstraintOp(
+                    name, tname, constraint.sqltext, schema=schema
+                )
+            )
+
+    for name in db_checks:
+        if name not in metadata_checks:
+            modify_table_ops.ops.append(
+                ops.DropConstraintOp(name, tname, schema=schema)
+            )
+
+
+@renderers.dispatch_for(ops.CreateCheckConstraintOp, replace=True)
+def render_create_check_constraint(autogen_context, op):
+    return (
+        "op.create_check_constraint(\n"
+        f"        {op.constraint_name!r},\n"
+        f"        {op.table_name!r},\n"
+        f"        {str(op.condition)!r},\n"
+        + (f"        schema={op.schema!r},\n" if op.schema else "")
+        + "    )"
+    )
+
+
+def include_object(object, name, type_, reflected, compare_to):
+    return True
+
+
 def run_migrations_offline():
     """Run migrations in 'offline' mode."""
-    # Use settings if available, fall back to alembic.ini
     url = (
         settings.database_url if settings else config.get_main_option("sqlalchemy.url")
     )
@@ -37,6 +94,7 @@ def run_migrations_offline():
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        include_object=include_object,
     )
 
     with context.begin_transaction():
@@ -51,7 +109,11 @@ def run_migrations_online():
     )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            include_object=include_object,
+        )
 
         with context.begin_transaction():
             context.run_migrations()
